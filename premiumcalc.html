@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Premium Calculator</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    input, select { width: 100%; padding: 8px; margin: 8px 0; }
+    button { padding: 10px 20px; }
+  </style>
+</head>
+<body>
+  <h1>Life Insurance Premium Calculator</h1>
+  <form id="premiumForm">
+    <label>Age: <input type="number" name="age" required></label>
+    <label>Policy Term: <input type="number" name="term" required></label>
+    <label>Sum Assured: <input type="number" name="sum_assured" required></label>
+    <label>Product Type:
+      <select name="product">
+        <option value="term">Term</option>
+        <option value="wholelife">Whole Life</option>
+        <option value="endowment">Endowment</option>
+        <option value="pure_endowment">Pure Endowment</option>
+      </select>
+    </label>
+    <button type="submit">Calculate Premium</button>
+  </form>
+  <h2 id="result"></h2>
+
+  <script>
+    const form = document.getElementById('premiumForm');
+    const result = document.getElementById('result');
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const query = new URLSearchParams(formData).toString();
+      const url = 'https://life-insurance-premium-calculator.onrender.com/calculate?' + query;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        result.textContent = data.premium ? `Estimated Premium: ₹${data.premium}` : 'Error: ' + (data.error || 'Invalid input.');
+      } catch (err) {
+        result.textContent = 'Failed to fetch premium. Try again.';
+      }
+    });
+  </script>
+</body>
+</html>
