@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Dynamic Premium Calculator</title>
+    <!-- Tailwind CSS CDN for easy and trendy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            background-size: 400% 400%;
+            animation: gradient-animation 20s ease infinite;
+        }
+
+        @keyframes gradient-animation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        input:required:invalid:not(:focus) {
+            border-color: #ef4444;
+        }
+        button, select, input {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .delay-700 { animation-delay: 0.7s; }
+
+        .button-press-effect:active {
+            transform: scale(0.96);
+            box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+        }
+
+        .result-box-appear {
+            animation: scaleInBounce 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+        @keyframes scaleInBounce {
+            0% { opacity: 0; transform: scale(0.7); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        .floating-element {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.7;
+            animation: float 15s ease-in-out infinite;
+            pointer-events: none;
+            filter: blur(0.5px);
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
+            25% { transform: translate(20px, -30px) rotate(5deg); opacity: 0.8; }
+            50% { transform: translate(0, -60px) rotate(-5deg); opacity: 0.7; }
+            75% { transform: translate(-20px, -30px) rotate(5deg); opacity: 0.6; }
+            100% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
+        }
+        .float-1 { top: 10%; left: 5%; animation-delay: 0s; animation-duration: 18s; }
+        .float-2 { top: 80%; left: 90%; animation-delay: 2s; animation-duration: 16s; }
+        .float-3 { top: 30%; left: 70%; animation-delay: 4s; animation-duration: 19s; }
+        .float-4 { top: 60%; left: 20%; animation-delay: 6s; animation-duration: 17s; }
+        .float-5 { top: 5%; left: 80%; animation-delay: 1s; animation-duration: 15s; }
+        .float-6 { top: 90%; left: 15%; animation-delay: 3s; animation-duration: 20s; }
+        .float-7 { top: 45%; left: 50%; animation-delay: 5s; animation-duration: 16s; }
+        .float-8 { top: 20%; left: 40%; animation-delay: 7s; animation-duration: 18s; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            max-width: 90%;
+            width: 450px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #4a5568;
+            transition: color 0.2s ease-in-out;
+        }
+        .modal-close-button:hover {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-200 via-purple-100 to-pink-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Floating Decorative Elements -->
+    <div class="floating-element float-1">✨</div>
+    <div class="floating-element float-2">🌟</div>
+    <div class="floating-element float-3">🌈</div>
+    <div class="floating-element float-4">💡</div>
+    <div class="floating-element float-5">💫</div>
+    <div class="floating-element float-6">💖</div>
+    <div class="floating-element float-7">💰</div>
+    <div class="floating-element float-8">📈</div>
+
+    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-lg transform hover:scale-105 transition-transform duration-300 ease-in-out fade-in-up delay-100 relative z-10">
+        <!-- Info Button -->
+        <button id="infoButton" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none text-2xl button-press-effect">
+            &#x2022;&#x2022;&#x2022;
+        </button>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-gray-800 mb-6 leading-tight fade-in-up delay-200">
+            Calculate Your Premium!
+        </h1>
+        <p class="text-center text-gray-600 mb-8 text-lg fade-in-up delay-300">
+            Just a few details to get your estimated insurance premium.
+        </p>
+        
+        <!-- Input Form -->
+        <div class="space-y-6">
+            <div class="fade-in-up delay-400">
+                <label for="age" class="block text-base font-medium text-gray-700 mb-2">Your Age:</label>
+                <input type="number" id="age" min="20" max="80" placeholder="e.g., 30" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg">
+            </div>
+
+            <div class="fade-in-up delay-500">
+                <label for="term" class="block text-base font-medium text-gray-700 mb-2">Policy Term (Years):</label>
+                <input type="number" id="term" min="1" placeholder="e.g., 20 years (Don't enter for Whole Life Assurance)"
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg">
+            </div>
+
+            <div class="fade-in-up delay-600">
+                <label for="sumAssured" class="block text-base font-medium text-gray-700 mb-2">Sum Assured (₹):</label>
+                <input type="number" id="sumAssured" min="1000" placeholder="e.g., 10,00,000" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg">
+            </div>
+
+            <div class="fade-in-up delay-700">
+                <label for="policyType" class="block text-base font-medium text-gray-700 mb-2">Choose Policy Type:</label>
+                <select id="policyType" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg appearance-none bg-white pr-8">
+                    <option value="">Select a policy type</option>
+                    <option value="wholelife">Whole Life Insurance</option>
+                    <option value="term">Term Insurance</option>
+                    <option value="endowment">Endowment Policy</option>
+                    <option value="pure_endowment">Pure Endowment Policy</option>
+                </select>
+            </div>
+
+            <button id="calculateBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-102 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 text-lg button-press-effect">
+                Calculate My Premium
+            </button>
+        </div>
+
+        <!-- Result Display Area -->
+        <div id="resultBox" class="mt-10 p-6 bg-green-50 rounded-2xl border border-green-200 text-center shadow-inner hidden">
+            <h2 class="text-xl md:text-2xl font-semibold text-green-800 mb-3">Your Estimated Annual Premium:</h2>
+            <p id="premiumResult" class="text-4xl md:text-5xl font-extrabold text-green-900 drop-shadow-md">₹0.00</p>
+            <p id="errorMessage" class="text-red-600 text-base mt-4 font-medium hidden"></p>
+        </div>
+
+        <p class="text-center text-gray-500 text-sm mt-8 fade-in-up delay-700">
+            <span class="font-semibold">Disclaimer:</span> This calculation provides an estimate for illustration purposes only and is not a final quote.
+        </p>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="closeModal" class="modal-close-button">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">About This Project</h3>
+            <p class="text-gray-700 leading-relaxed text-left">
+                This project is in progress and it will contain many more upcoming exciting estimations.
+                <br><br>
+                The estimations are calculated through formulas provided in CM-1 study material.
+                <br><br>
+                The table used for calculation is AM92 with the interest rate being 4% p.a.
+                <br><br>
+                If you have any suggestions or queries, please get in touch through
+                <a href="mailto:pmpratham.malhotra@gmail.com" class="text-blue-600 hover:text-blue-800 underline font-semibold">pmpratham.malhotra@gmail.com</a>
+                .
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Mortality Data
+        const mortality_data = [
+            { age: 20, qx: 0.000582, lx: 9982.2006, Ax: 0.11226 },
+            { age: 21, qx: 0.000577, lx: 9976.3909, Ax: 0.11624 },
+            { age: 22, qx: 0.000572, lx: 9970.6346, Ax: 0.12038 },
+            { age: 23, qx: 0.000569, lx: 9964.9313, Ax: 0.12469 },
+            { age: 24, qx: 0.000567, lx: 9959.2613, Ax: 0.12919 },
+            { age: 25, qx: 0.000566, lx: 9953.6144, Ax: 0.13386 },
+            { age: 26, qx: 0.000567, lx: 9947.9807, Ax: 0.13873 },
+            { age: 27, qx: 0.000570, lx: 9942.3402, Ax: 0.14379 },
+            { age: 28, qx: 0.000574, lx: 9936.6730, Ax: 0.14906 },
+            { age: 29, qx: 0.000580, lx: 9930.9694, Ax: 0.15454 },
+            { age: 30, qx: 0.000590, lx: 9925.2094, Ax: 0.16023 },
+            { age: 31, qx: 0.000602, lx: 9919.3535, Ax: 0.16615 },
+            { age: 32, qx: 0.000617, lx: 9913.3821, Ax: 0.17230 },
+            { age: 33, qx: 0.000636, lx: 9907.2655, Ax: 0.17868 },
+            { age: 34, qx: 0.000660, lx: 9900.9645, Ax: 0.18531 },
+            { age: 35, qx: 0.000689, lx: 9894.4299, Ax: 0.19219 },
+            { age: 36, qx: 0.000724, lx: 9887.6126, Ax: 0.19933 },
+            { age: 37, qx: 0.000765, lx: 9880.4540, Ax: 0.20672 },
+            { age: 38, qx: 0.000813, lx: 9872.8954, Ax: 0.21439 },
+            { age: 39, qx: 0.000870, lx: 9864.8688, Ax: 0.22234 },
+            { age: 40, qx: 0.000937, lx: 9856.2863, Ax: 0.23056 },
+            { age: 41, qx: 0.001014, lx: 9847.0510, Ax: 0.23907 },
+            { age: 42, qx: 0.001104, lx: 9837.0661, Ax: 0.24787 },
+            { age: 43, qx: 0.001208, lx: 9826.2060, Ax: 0.25696 },
+            { age: 44, qx: 0.001327, lx: 9814.3359, Ax: 0.26636 },
+            { age: 45, qx: 0.001465, lx: 9801.3123, Ax: 0.27605 },
+            { age: 46, qx: 0.001622, lx: 9786.9534, Ax: 0.28605 },
+            { age: 47, qx: 0.001802, lx: 9771.0789, Ax: 0.29635 },
+            { age: 48, qx: 0.002008, lx: 9753.4714, Ax: 0.30695 },
+            { age: 49, qx: 0.002241, lx: 9733.8865, Ax: 0.31786 },
+            { age: 50, qx: 0.002508, lx: 9712.0728, Ax: 0.32907 },
+            { age: 51, qx: 0.002809, lx: 9687.7149, Ax: 0.34058 },
+            { age: 52, qx: 0.003152, lx: 9660.5021, Ax: 0.35238 },
+            { age: 53, qx: 0.003539, lx: 9630.0522, Ax: 0.36448 },
+            { age: 54, qx: 0.003976, lx: 9595.9715, Ax: 0.37685 },
+            { age: 55, qx: 0.004469, lx: 9557.8179, Ax: 0.38950 },
+            { age: 56, qx: 0.005025, lx: 9515.1040, Ax: 0.40240 },
+            { age: 57, qx: 0.005650, lx: 9467.2906, Ax: 0.41556 },
+            { age: 58, qx: 0.006352, lx: 9413.8004, Ax: 0.42896 },
+            { age: 59, qx: 0.007140, lx: 9354.0040, Ax: 0.44258 },
+            { age: 60, qx: 0.008022, lx: 9287.2164, Ax: 0.45640 },
+            { age: 61, qx: 0.009009, lx: 9212.7143, Ax: 0.47041 },
+            { age: 62, qx: 0.010112, lx: 9129.7170, Ax: 0.48458 },
+            { age: 63, qx: 0.011344, lx: 9037.3973, Ax: 0.49890 },
+            { age: 64, qx: 0.012716, lx: 8934.8771, Ax: 0.51333 },
+            { age: 65, qx: 0.014243, lx: 8821.2612, Ax: 0.52786 },
+            { age: 66, qx: 0.015940, lx: 8695.6199, Ax: 0.54246 },
+            { age: 67, qx: 0.017824, lx: 8557.0118, Ax: 0.55710 },
+            { age: 68, qx: 0.019913, lx: 8404.4916, Ax: 0.57175 },
+            { age: 69, qx: 0.022226, lx: 8237.1329, Ax: 0.58638 },
+            { age: 70, qx: 0.024783, lx: 8054.0544, Ax: 0.60097 },
+            { age: 71, qx: 0.027606, lx: 7854.4508, Ax: 0.61548 },
+            { age: 72, qx: 0.030718, lx: 7637.6208, Ax: 0.62988 },
+            { age: 73, qx: 0.034144, lx: 7403.0084, Ax: 0.64414 },
+            { age: 74, qx: 0.037911, lx: 7150.2401, Ax: 0.65824 },
+            { age: 75, qx: 0.042046, lx: 6879.1673, Ax: 0.67214 },
+            { age: 76, qx: 0.046578, lx: 6589.9258, Ax: 0.68581 },
+            { age: 77, qx: 0.051538, lx: 6282.9803, Ax: 0.69924 },
+            { age: 78, qx: 0.056956, lx: 5959.1680, Ax: 0.71238 },
+            { age: 79, qx: 0.062867, lx: 5619.7577, Ax: 0.72523 },
+            { age: 80, qx: 0.069303, lx: 5266.4604, Ax: 0.73775 }
+        ];
+
+        // Constants
+        const interest = 0.04;
+        const v = 1 / (1 + interest);
+        const D = interest / (1 + interest);
+        
+        // Expense constants
+        const expenseTA = 2000;
+        const expenseWL = 3000;
+        const expensePE = 4000;
+        const expenseEA = 6000;
+
+        function getAx(age) {
+            const dataRow = mortality_data.find(row => row.age === age);
+            return dataRow ? dataRow.Ax : null;
+        }
+
+        function npx(age, n) {
+            const lx_current = mortality_data.find(row => row.age === age)?.lx;
+            const lx_future = mortality_data.find(row => row.age === age + n)?.lx;
+
+            if (lx_current === undefined || lx_future === undefined || lx_current === 0) {
+                return null;
+            }
+            return lx_future / lx_current;
+        }
+
+        function calculate_term_premium(age, term, sum_assured) {
+            const Ax_age = getAx(age);
+            const Ax_later = getAx(age + term);
+            const prob_npx_val = npx(age, term);
+
+            if (Ax_age === null || Ax_later === null || prob_npx_val === null) {
+                return null;
+            }
+            
+            const TAxn = Ax_age - (Math.pow(v, term) * prob_npx_val * Ax_later);
+            const adue = (1 - TAxn) / D;
+            const premium = (sum_assured * TAxn + expenseTA * adue) / adue;
+
+            return parseFloat(premium.toFixed(3));
+        }
+
+        function calculate_wholelife_premium(age, sum_assured) {
+            const Ax_age = getAx(age);
+            if (Ax_age === null) {
+                return null;
+            }
+
+            const aduex = (1 - Ax_age) / D;
+            const premium = (sum_assured * Ax_age + expenseWL * aduex) / aduex;
+
+            return parseFloat(premium.toFixed(3));
+        }
+
+        function calculate_endowment_premium(age, term, sum_assured) {
+            const Ax_age = getAx(age);
+            const Ax_later = getAx(age + term);
+            const prob_npx_val = npx(age, term);
+
+            if (Ax_age === null || Ax_later === null || prob_npx_val === null) {
+                return null;
+            }
+
+            const EAxn = (Ax_age - (Math.pow(v, term) * prob_npx_val * Ax_later)) + (Math.pow(v, term) * prob_npx_val);
+            const adue = (1 - (Ax_age - (Math.pow(v, term) * prob_npx_val * Ax_later))) / D;
+            const premium = (sum_assured * EAxn + expenseEA * adue) / adue;
+
+            return parseFloat(premium.toFixed(3));
+        }
+
+        function calculate_pure_premium(age, term, sum_assured) {
+            const Ax_age = getAx(age);
+            const Ax_later = getAx(age + term);
+            const prob_npx_val = npx(age, term);
+
+            if (Ax_age === null || Ax_later === null || prob_npx_val === null) {
+                return null;
+            }
+
+            const PAxn = Math.pow(v, term) * prob_npx_val;
+            const adue = (1 - (Ax_age - (Math.pow(v, term) * prob_npx_val * Ax_later))) / D;
+            const premium = (sum_assured * PAxn + expensePE * adue) / adue;
+
+            return parseFloat(premium.toFixed(3));
+        }
+
+        // Get references to HTML elements
+        const ageInput = document.getElementById('age');
+        const termInput = document.getElementById('term');
+        const sumAssuredInput = document.getElementById('sumAssured');
+        const policyTypeSelect = document.getElementById('policyType');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const premiumResult = document.getElementById('premiumResult');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultBox = document.getElementById('resultBox');
+        const infoButton = document.getElementById('infoButton');
+        const infoModal = document.getElementById('infoModal');
+        const closeModalButton = document.getElementById('closeModal');
+
+        function showErrorMessage(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            premiumResult.textContent = '₹0.00';
+            resultBox.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'result-box-appear');
+            resultBox.classList.add('bg-red-50', 'border-red-200');
+            resultBox.classList.remove('hidden');
+        }
+
+        function clearErrorMessage() {
+            errorMessage.classList.add('hidden');
+            errorMessage.textContent = '';
+            resultBox.classList.remove('bg-red-50', 'border-red-200');
+            resultBox.classList.add('bg-green-50', 'border-green-200');
+        }
+
+        policyTypeSelect.addEventListener('change', () => {
+            const selectedType = policyTypeSelect.value;
+            if (selectedType === 'wholelife') {
+                termInput.value = '';
+                termInput.setAttribute('disabled', 'true');
+                termInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                termInput.removeAttribute('required');
+                termInput.placeholder = 'Not applicable for Whole Life';
+            } else {
+                termInput.removeAttribute('disabled');
+                termInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                termInput.setAttribute('required', 'true');
+                termInput.placeholder = 'e.g., 20 years (Don\'t enter for Whole Life Assurance)';
+            }
+            resultBox.classList.add('hidden');
+            resultBox.classList.remove('result-box-appear');
+            clearErrorMessage();
+        });
+
+        calculateBtn.addEventListener('click', () => {
+            clearErrorMessage();
+
+            const age = parseInt(ageInput.value);
+            const term = parseInt(termInput.value);
+            const sumAssured = parseFloat(sumAssuredInput.value);
+            const policyType = policyTypeSelect.value;
+
+            if (isNaN(age) || age < 20 || age > 80) {
+                showErrorMessage('Oops! Please enter a valid age between 20 and 80. Your data is only available for these ages.');
+                return;
+            }
+            if (isNaN(sumAssured) || sumAssured <= 0) {
+                showErrorMessage('A sum assured is needed! Please enter a value greater than 0.');
+                return;
+            }
+            if (!policyType) {
+                showErrorMessage('Please select an insurance policy type to continue!');
+                return;
+            }
+
+            let calculatedPremium = null;
+
+            switch (policyType) {
+                case 'wholelife':
+                    calculatedPremium = calculate_wholelife_premium(age, sumAssured);
+                    break;
+                case 'term':
+                    if (isNaN(term) || term <= 0) {
+                        showErrorMessage('For Term Insurance, please enter a valid policy term (years > 0).');
+                        return;
+                    }
+                    if (age + term > 80 || age + term < 20) {
+                        showErrorMessage(`Policy term is too long or too short for your age. The end age (your age + term) must be between 20 and 80 based on available data.`);
+                        return;
+                    }
+                    calculatedPremium = calculate_term_premium(age, term, sumAssured);
+                    break;
+                case 'endowment':
+                    if (isNaN(term) || term <= 0) {
+                        showErrorMessage('For Endowment Policy, please enter a valid policy term (years > 0).');
+                        return;
+                    }
+                    if (age + term > 80 || age + term < 20) {
+                        showErrorMessage(`Policy term is too long or too short for your age. The end age (your age + term) must be between 20 and 80 based on available data.`);
+                        return;
+                    }
+                    calculatedPremium = calculate_endowment_premium(age, term, sumAssured);
+                    break;
+                case 'pure_endowment':
+                    if (isNaN(term) || term <= 0) {
+                        showErrorMessage('For Pure Endowment, please enter a valid policy term (years > 0).');
+                        return;
+                    }
+                    if (age + term > 80 || age + term < 20) {
+                        showErrorMessage(`Policy term is too long or too short for your age. The end age (your age + term) must be between 20 and 80 based on available data.`);
+                        return;
+                    }
+                    calculatedPremium = calculate_pure_premium(age, term, sumAssured);
+                    break;
+                default:
+                    showErrorMessage('Something went wrong with policy type selection. Please try again.');
+                    return;
+            }
+
+            if (calculatedPremium !== null) {
+                premiumResult.textContent = `₹${calculatedPremium.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                resultBox.classList.remove('hidden');
+                resultBox.classList.add('result-box-appear');
+            } else {
+                showErrorMessage('We hit a snag calculating the premium. Please double-check your inputs.');
+            }
+        });
+
+        [ageInput, termInput, sumAssuredInput].forEach(input => {
+            input.addEventListener('input', () => {
+                resultBox.classList.add('hidden');
+                resultBox.classList.remove('result-box-appear');
+                clearErrorMessage();
+            });
+        });
+
+        infoButton.addEventListener('click', () => {
+            infoModal.classList.remove('hidden');
+            infoModal.classList.add('show');
+        });
+
+        closeModalButton.addEventListener('click', () => {
+            infoModal.classList.remove('show');
+            setTimeout(() => {
+                infoModal.classList.add('hidden');
+            }, 300);
+        });
+
+        infoModal.addEventListener('click', (event) => {
+            if (event.target === infoModal) {
+                infoModal.classList.remove('show');
+                setTimeout(() => {
+                    infoModal.classList.add('hidden');
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
